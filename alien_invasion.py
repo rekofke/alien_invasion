@@ -17,8 +17,19 @@ class Ship:
         self.image = pygame.image.load('images/ship.bmp')  # Fixed assignment
         self.rect = self.image.get_rect()                  # Fixed assignment
 
-        # Start at bottom center
+        # Start each new ship the bottom center of the screen
         self.rect.midbottom = self.screen_rect.midbottom
+
+        # Movement flag: start with a ship that's not moving
+        self.moving_right = False
+        self.moving_left = False
+
+    def update(self):
+        """ Update the ship's position based on the movement flag."""
+        if self.moving_right:
+            self.rect.x += 1
+        if self.moving_left:
+            self.rect.x -= 1
 
     def blitme(self):  # Fixed method name
         """Draw the ship at current location"""
@@ -40,16 +51,35 @@ class AlienInvasion:
     def run_game(self):
         """Main game loop"""
         while True:
-            # Event handling
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-            
-            # Update screen
-            self.screen.fill(self.settings.bg_color)
-            self.ship.blitme()  # Use correct method name
-            pygame.display.flip()
+            self._check_events()
+            self.ship.update()
+            self._update_screen()
             self.clock.tick(60)
+
+    def _check_events(self):
+        """Respond to keypresses and mouse events"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    self.ship.moving_right = True
+                elif event.key == pygame.K_LEFT:
+                    self.ship.moving_left = True
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_RIGHT:
+                    self.ship.moving_right = false
+                elif event.key == pygame.K_LEFT:
+                    self.ship.moving_left = False
+                    # Move ship to the right.
+                    self.ship.rect.x += 1
+            
+    def _update_screen(self):
+        """Update images on the screen and flip to a new screen."""
+        self.screen.fill(self.settings.bg_color)
+        self.ship.blitme()  # Use correct method name
+        pygame.display.flip()
+        self.clock.tick(60)
 
 if __name__ == '__main__':
     ai = AlienInvasion()
