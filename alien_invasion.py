@@ -2,13 +2,7 @@ import sys
 import pygame
 from ship import Ship
 from bullet import Bullet
-
-class Settings:
-    def __init__(self):
-        self.screen_width = 1200
-        self.screen_height = 800
-        self.bg_color = (230, 230, 230)
-        self.ship_speed = 1.5
+from settings import Settings
 
 class AlienInvasion:
     def __init__(self):
@@ -31,6 +25,7 @@ class AlienInvasion:
     def _update_bullets(self):
         self.bullets.update()
         # Get ridof bullets that have dissappeared.
+        print(f"Number of bullets: {len(self.bullets)}")
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
@@ -66,9 +61,17 @@ class AlienInvasion:
 
     def _fire_bullet(self):  # ✅ Added underscore
         """Create a new bullet and add it to the bullets group."""
-        new_bullet = Bullet(self)
-        self.bullets.add(new_bullet)
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
         print("Bullet fired!")
+
+    def _update_bullets(self):
+        self.bullets.update()  
+        # Get rid of bullets that have disappeared.
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <=0:
+                self.bullets.remove(bullet)
 
     def _update_screen(self):
         self.screen.fill(self.settings.bg_color)
@@ -78,5 +81,9 @@ class AlienInvasion:
         pygame.display.flip()
 
 if __name__ == '__main__':
-    ai = AlienInvasion()
-    ai.run_game()
+    try:
+        ai = AlienInvasion()
+        ai.run_game()
+    except Exception as e:
+        print(f"CRITICAL ERROR: {e}")
+        pygame.quit()
